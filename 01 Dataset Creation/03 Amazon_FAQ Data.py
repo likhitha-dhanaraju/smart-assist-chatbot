@@ -18,7 +18,6 @@ if not os.path.exists(destination_dir):
 
 product_limit = 100
 
-
 category_products_list = {}
 
 for category in tqdm(os.listdir(product_dir)):
@@ -34,7 +33,7 @@ for category in tqdm(os.listdir(product_dir)):
 print('Setting up the Amazon website....')
 
 options = webdriver.ChromeOptions()
-#options.add_argument('--headless')
+options.add_argument('--headless')
 options.add_argument("--incognito")
 options.add_argument('--disable-blink-features=AutomationControlled')
 driver = webdriver.Chrome(options=options)
@@ -58,43 +57,49 @@ for category in category_products_list.keys():
 
     print(category)
     QnA_data = {}
-    for i, product_name in enumerate(tqdm(category_products_list[category])):
 
-        if i % 50 == 0 and i!= 0:
-            driver.close()
-            driver = webdriver.Chrome(options=options)
+    if not os.path.exists(os.path.join(destination_dir, category + '_Amazon QnA_data.json')):
 
-            custom_Amazon_captcha_solver(driver, driver_close=False)
+        for i, product_name in enumerate(tqdm(category_products_list[category])):
 
-            with open(os.path.join(destination_dir, category + '_Amazon QnA_data.json'), 'w') as f:
-                json.dump(QnA_data, f)
-                f.close()
+            if i % 30 == 0 and i!= 0:
+                driver.close()
+                driver = webdriver.Chrome(options=options)
 
-        url = base_url + product_name
+                custom_Amazon_captcha_solver(driver, driver_close=False)
 
-        driver.get(url)
-        time.sleep(1)
+                with open(os.path.join(destination_dir, category + '_Amazon QnA_data.json'), 'w') as f:
+                    json.dump(QnA_data, f)
+                    f.close()
 
-        num_of_qna = len(driver.find_elements(By.XPATH, '//*[@class="a-section askTeaserQuestions"]/div'))
+            url = base_url + product_name
 
-        if num_of_qna > 0:
+            driver.get(url)
 
-            try:
-                # Find all question-answer pairs
-                question_answer_pairs = []
+            num_of_qna = len(driver.find_elements(By.XPATH, '//*[@class="a-section askTeaserQuestions"]/div'))
 
-                for qa_div in range(num_of_qna):
-                    question = driver.find_element(By.XPATH, '//*[@class="a-section askTeaserQuestions"]/div[' + str(
-                        qa_div + 1) + ']/div/div[2]/div[1]/div/div[2]/a/span').text
-                    answer = driver.find_element(By.XPATH,
-                                                 '//*[@class="a-section askTeaserQuestions"]/div[' + str(
-                                                     qa_div + 1) + ']/div/div[2]/div[2]/div/div[2]/span[1]').text
-                    question_answer_pairs.append([question, answer])
+            if num_of_qna > 0:
 
-                QnA_data[product_name] = question_answer_pairs
-            except:
+                try:
+                    # Find all question-answer pairs
+                    question_answer_pairs = []
 
-                pass
+                    for qa_div in range(num_of_qna):
+                        question = driver.find_element(By.XPATH, '//*[@class="a-section askTeaserQuestions"]/div[' + str(
+                            qa_div + 1) + ']/div/div[2]/div[1]/div/div[2]/a/span').text
+                        answer = driver.find_element(By.XPATH,
+                                                     '//*[@class="a-section askTeaserQuestions"]/div[' + str(
+                                                         qa_div + 1) + ']/div/div[2]/div[2]/div/div[2]/span[1]').text
+                        question_answer_pairs.append([question, answer])
+
+                    QnA_data[product_name] = question_answer_pairs
+                except:
+
+                    pass
+
+        with open(os.path.join(destination_dir, category + '_Amazon QnA_data.json'), 'w') as f:
+            json.dump(QnA_data, f)
+            f.close()
 
 driver.close()
 
