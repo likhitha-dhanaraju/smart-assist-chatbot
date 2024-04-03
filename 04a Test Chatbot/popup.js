@@ -12,26 +12,27 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   function sendMessage() {
-    const userMessage = userInput.value.trim();
-    if (userMessage !== '') {
-      addMessage('You: ' + userMessage, 'user');
-      userInput.value = '';
+  const userMessage = userInput.value.trim();
+  const currentUrl = window.location.href; // Get the current URL
+  if (userMessage !== '') {
+    addMessage('You: ' + userMessage, 'user');
+    userInput.value = '';
 
-      // Send message to backend server
-      fetch('http://localhost:5000/generate_response', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ user_input: userMessage }),
-      })
-      .then(response => response.json())
-      .then(data => {
-        addMessage('Bot: ' + data.response, 'bot');
-      })
-      .catch(error => console.error('Error:', error));
-    }
+    // Send message and URL to backend server
+    fetch('http://localhost:5000/generate_response', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ user_input: userMessage, url: currentUrl }), // Include URL in the request
+    })
+    .then(response => response.json())
+    .then(data => {
+      addMessage('Bot: ' + data.response, 'bot');
+    })
+    .catch(error => console.error('Error:', error));
   }
+}
 
   sendBtn.addEventListener('click', sendMessage);
 
