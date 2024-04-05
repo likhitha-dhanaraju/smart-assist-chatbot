@@ -1,74 +1,129 @@
 body {
   font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
 }
 
 .chat-container {
+  width: 500px;
+  /*display: flex;*/
+  /*flex-direction: column;*/
+  align-items: center;
+  /*width: 100%;*/
   max-width: 600px;
-  margin: 20px auto;
+  margin: 0 auto;
   padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
+  box-sizing: border-box;
+  background-color: #fff; /* Amazon's primary color */
 }
 
 #chat-output {
-  height: 300px;
-  overflow-y: scroll;
+  width: 100%;
+  height: 400px;
+  border: 1px solid #ddd; /* Amazon's border color */
+  padding: 10px;
+  box-sizing: border-box;
+  overflow-y: auto;
   margin-bottom: 10px;
-  border-bottom: 1px solid #ccc;
-  padding-bottom: 10px;
 }
 
 .message {
   padding: 10px;
-  border-radius: 15px;
-  margin-bottom: 10px;
-}
-
-.user-message {
-  background-color: #dcf8c6;
-  float: right;
+  border-radius: 5px;
+  margin-bottom: 5px;
 }
 
 .bot-message {
-  background-color: #e6e6e6;
-  float: left;
+  background-color: #f0f8ff; /* Amazon's lightest color */
+}
+
+.user-message {
+  background-color: #f5f5f5; /* Amazon's secondary color */
 }
 
 #user-input {
-  width: calc(100% - 70px);
-  padding: 5px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-#send-btn {
-  padding: 5px 10px;
-  background-color: #007bff;
-  color: #fff;
+  width: 100%;
+  padding: 10px;
   border: none;
   border-radius: 5px;
+  box-sizing: border-box;
+  margin-bottom: 10px;
+}
+
+/*#typing-indicator {*/
+/*  display: none;*/
+/*  width: 10px;*/
+/*  height: 10px;*/
+/*  border-radius: 50%;*/
+/*  background-color: #007bff;*/
+/*  margin-right: 10px;*/
+/*  animation: typing-indicator 1s infinite;*/
+/*}*/
+
+/*@keyframes typing-indicator {*/
+/*  0% {*/
+/*    transform: rotate(0deg);*/
+/*  }*/
+/*  100% {*/
+/*    transform: rotate(360deg);*/
+/*  }*/
+/*}*/
+
+.tiblock {
+    align-items: center;
+    height: 17px;
+}
+
+.ticontainer .tidot {
+    background-color: #90949c;
+}
+
+.tidot {
+    -webkit-animation: mercuryTypingAnimation 1.5s infinite ease-in-out;
+    border-radius: 2px;
+    display: inline-block;
+    height: 4px;
+    margin-right: 2px;
+    width: 4px;
+}
+
+@-webkit-keyframes mercuryTypingAnimation{
+0%{
+  -webkit-transform:translateY(0px)
+}
+28%{
+  -webkit-transform:translateY(-5px)
+}
+44%{
+  -webkit-transform:translateY(0px)
+}
+}
+
+.tidot:nth-child(1){
+-webkit-animation-delay:200ms;
+}
+.tidot:nth-child(2){
+-webkit-animation-delay:300ms;
+}
+.tidot:nth-child(3){
+-webkit-animation-delay:400ms;
+}
+
+.options-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+button {
+  background-color: #f0f8ff; /* Amazon's lightest color */
+  border: none;
+  border-radius: 5px;
+  padding: 10px;
+  margin: 0 5px;
   cursor: pointer;
 }
 
-.typing-dots {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-  margin-left: 5px;
-}
-
-.typing-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background-color: #007bff;
-  margin: 0 2px;
-  animation: flicker 1s infinite;
-}
-
-@keyframes flicker {
-  0% { opacity: 1; }
-  50% { opacity: 0.5; }
-  100% { opacity: 1; }
+button:hover {
+  background-color: #e0f2fe; /* Amazon's lighter color */
 }
