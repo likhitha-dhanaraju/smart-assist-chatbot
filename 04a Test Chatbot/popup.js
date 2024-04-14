@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const userInput = document.getElementById('user-input')
   const sendBtn = document.getElementById('send-btn')
   const ticontainer = document.getElementsByClassName('ticontainer')
+  const returnBtn = document.getElementById('return-btn')
 
   const defaultMessage = 'Hello, I am a helpful AI assistant. How can I assist you today?'
 
@@ -59,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const optionButtons = document.querySelectorAll('#option-1, #option-2, #option-3')
     optionButtons.forEach(button => {
-      button.addEventListener('click', () => {
+      button.addEventListener('click', () =>{
         const userChoice = button.innerText
         sendMessage(userChoice, 'user', userChoice) // Pass the selected option to the sendMessage function
 
@@ -69,7 +70,26 @@ document.addEventListener('DOMContentLoaded', function() {
     })
   }
 
-  // Send default message when thepage loads
+  function returnToMainMenu() {
+    const userInput = document.getElementById('user-input')
+    const optionsContainer = document.querySelector('.options-container')
+    const returnBtn = document.getElementById('return-btn')
+
+    sendMessage('', 'bot', null) // Send an empty message to clear the previous input
+    userInput.value = ''
+
+    // Hide options and show return button
+    optionsContainer.style.display = 'none'
+    returnBtn.style.display = 'block'
+
+    // Add event listener to the return button
+    returnBtn.addEventListener('click', function() {
+      optionsContainer.style.display = 'block'
+      returnBtn.style.display = 'none'
+    })
+  }
+
+  // Send default message when the page loads
   sendMessage(defaultMessage)
 
   // Add event listener to the user input field
@@ -84,9 +104,14 @@ document.addEventListener('DOMContentLoaded', function() {
     sendMessage(userInput.value)
   })
 
-  // Add event listener to the chat container to show typing indicator
+ // Add event listener to the chat container to show typing indicator
   const chatContainer = document.querySelector('.chat-container')
   chatContainer.addEventListener('input', function() {
     ticontainer[0].style.display = 'block'
+  })
+
+  // Add event listener to the return button
+  returnBtn.addEventListener('click', function() {
+    returnToMainMenu()
   })
 })
