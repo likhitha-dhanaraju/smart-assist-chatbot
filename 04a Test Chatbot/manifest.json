@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Simple Chatbot Extension",
+  "name": "SmartAssist: Shopping Assistant",
   "version": "1.0",
   "permissions": ["activeTab", "storage"],
   "action": {

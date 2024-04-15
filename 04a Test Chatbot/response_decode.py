@@ -2,6 +2,9 @@ from transformers import T5ForConditionalGeneration, T5Tokenizer
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer, pipeline
 import json
 import os
+import warnings
+warnings.filterwarnings("ignore")
+
 
 root = r'C:\\Users\\likhi\\Documents\\02 Pycharm Datasets\\01 Master Thesis\\07 QnA\\Saved Models\\'
 qna_model = T5ForConditionalGeneration.from_pretrained(os.path.join(root, "trained_t5_model_10_percent_data_epoch_10"))
@@ -47,13 +50,16 @@ def generate_recommendation_response(user_input, scraped_data):
     response = qna_tokenizer.decode(output_ids[0], skip_special_tokens=True)
     return response
 
+def main_option_selection(main_option):
 
-def generate_response(url):
+    return
+
+def generate_response(main_option, url):
     global response
 
-    print("Let's chat! (type 'quit' to exit)")
-
-    print("Bot: Select one of the options - Ask about Product, Ask about customer reviews or Ask about customized Product reviews. Select Main Menu to go back")
+    # print("Let's chat! (type 'quit' to exit)")
+    #
+    # print("Bot: Select one of the options - Ask about Product, Ask about customer reviews or Ask about customized Product reviews. Select Main Menu to go back")
 
     while True:
         main_option = input("You: ")
@@ -61,13 +67,13 @@ def generate_response(url):
         scraped_data = scrape_data_from_url(url)
 
         if main_option == "Ask about the product":
-            print("Bot: Please ask your questions!")
+            # print("Bot: Please ask your questions!")
             while True:
                 user_input = input("You: ")
                 if user_input == 'Main Menu':
                     break
                 response = generate_product_response(user_input, scraped_data)
-                print("Bot:", response)
+                return {"SmartAssist:", response}
 
         elif main_option == "Ask about customer reviews":
             product_file_path = r"C:\Users\likhi\Documents\02 Pycharm Datasets\01 Master Thesis\04 Product Data\Women's Fashion_Clothing\Product_B0B6412QWW\Product_B0B6412QWW.json"
@@ -77,7 +83,7 @@ def generate_response(url):
                                     for i in product_data['reviews']]
             product_data_reviews_text = '. '.join(product_data_reviews)
             response = generate_review_response(product_data_reviews_text)
-            print("Bot:", response)
+            return {"SmartAssist:", response}
 
         elif main_option == "Ask about customized Product reviews":
             while True:
@@ -85,13 +91,11 @@ def generate_response(url):
                 if user_input == 'Main Menu':
                     break
                 response = generate_recommendation_response(user_input, scraped_data)
-                print("Bot:", response)
+                return {"SmartAssist:", response}
 
         elif main_option == 'quit':
             break
 
         else:
             response = 'Bot: No response'
-
-
-generate_response('test')
+            return {"SmartAssist" : response}
