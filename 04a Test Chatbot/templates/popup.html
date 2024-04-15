@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
-<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+<!--<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">-->
+
+<link rel="stylesheet" href="../static/styles.css">
 
 <head>
     <meta charset="UTF-8">
     <title>Chatbot</title>
 </head>
 <body>
+
 <div class="container">
     <div class="chatbox">
         <div class="chatbox__support">
@@ -23,7 +26,7 @@
                 <div></div>
             </div>
             <div class="chatbox__footer">
-                <input type="text" placeholder="Write a message...">
+                <input type="text" id="user-input" placeholder="Write a message...">
                 <button class="chatbox__send--footer send__button">Send</button>
             </div>
         </div>
@@ -33,10 +36,11 @@
     </div>
 </div>
 
-    <script>
-        $SCRIPT_ROOT = {{ request.script_root|tojson }};
-    </script>
-    <script type="text/javascript" src="{{ url_for('static', filename='app.js') }}"></script>
+<!--    <script>-->
+<!--        $SCRIPT_ROOT = {{ request.script_root|tojson }};-->
+<!--    </script>-->
+<!--    <script type="text/javascript" src="{{ url_for('static', filename='app.js') }}"></script>-->
 
+<script src="../static/app.js"></script>
 </body>
 </html>

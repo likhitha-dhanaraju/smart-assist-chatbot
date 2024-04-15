@@ -30,7 +30,6 @@ var data= {
 
 document.getElementById("init").addEventListener("click",showChatBot);
 var cbot= document.getElementById("chat-box");
-
 var len1= data.chatinit.title.length;
 
 function showChatBot(){
@@ -95,6 +94,7 @@ function handleOpt(){
     cbot.appendChild(elm);
 
     console.log(findText.toLowerCase());
+
     var tempObj= data[findText.toLowerCase()];
     if (findText.toLowerCase() === 'product') {
         // If Product Enquiry option is selected, show input text box
