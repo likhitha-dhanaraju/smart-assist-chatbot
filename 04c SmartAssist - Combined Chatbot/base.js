@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function() {
 
-    var data = {
+    var options_data = {
         chatinit: {
             title: ["Hello <span class='emoji'> &#128075; </span>", "You can select one of the below options to begin with!"],
             options: ["Product Enquiry", "Customer Reviews", "Personalized Product Recommendations"]
@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     var cbot = document.getElementById("chat-box");
-    var len1 = data.chatinit.title.length;
+    var len1 = options_data.chatinit.title.length;
     const userInput = document.getElementById('user-input');
 
     initChat();
@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", function() {
             setTimeout(handleChat, (i * 500));
         }
         setTimeout(function () {
-            showOptions(data.chatinit.options)
+            showOptions(options_data.chatinit.options)
         }, ((len1 + 1) * 500))
     }
 
@@ -46,11 +46,6 @@ document.addEventListener("DOMContentLoaded", function() {
             body: JSON.stringify({url: currentUrl}), // Include URL in the request
         })
             .then(response => response.json())
-            // .then(data => {
-            //   // Store the response in the variable
-            //   scraped_data = data.response;
-            //   // You can also add the message to the chatbox here if needed
-            // })
             .catch(error => console.error("Error:", error));
 
         // });
@@ -68,7 +63,7 @@ document.addEventListener("DOMContentLoaded", function() {
     function handleChat() {
         console.log(j);
         var elm = document.createElement("p");
-        elm.innerHTML = data.chatinit.title[j];
+        elm.innerHTML = options_data.chatinit.title[j];
         elm.setAttribute("class", "msg");
         cbot.appendChild(elm);
         j++;
@@ -102,16 +97,19 @@ document.addEventListener("DOMContentLoaded", function() {
         handleScroll();
 
         console.log(findText.toLowerCase());
-        var firstSelectedOption = data[findText.toLowerCase()];
+        var firstSelectedOption = options_data[findText.toLowerCase()];
 
         console.log(firstSelectedOption)
 
         if (firstSelectedOption.includes('product_enquiry')) {
-            console.log("Product Function Redirected")
+            console.log("Product Function Redirected");
+
             handleProductQueries();
+
         } else if (firstSelectedOption.includes('reviews')) {
             console.log("Customer Function Redirected")
             handleCustomerReviews();
+
             // } else if (firstSelectedOption.includes('personalized')){
             //     handleRecommendations();
         } else {
@@ -120,57 +118,62 @@ document.addEventListener("DOMContentLoaded", function() {
 
     }
 
-    async function handleProductQueries() {
-    botResponseCreator("Please ask your questions!");
+    function handleProductQueries() {
+        // Define the event listener function
+        function handleKeyPress(event) {
+            // Check if the key pressed is Enter
+            if (event.key === "Enter") {
+                // Get the value of the input field and trim any leading or trailing whitespace
+                const userMessage = userInput.value.trim();
+                userResponseCreator(userMessage);
+                console.log('User input:', userMessage);
 
-    async function getProductData() {
-            return new Promise((resolve, reject) => {
-                const userInputHandler = function(event) {
-                    if (event.key === "Enter") {
-                        const userMessage = userInput.value.trim();
-                        userResponseCreator(userMessage);
-                        userInput.value = "";
+                // Clear the input field
+                userInput.value = "";
 
-                        if (userMessage.toUpperCase() === "EXIT") {
-                            console.log("Exiting product query loop.");
-                            userInput.removeEventListener("keypress", userInputHandler); // Remove the event listener
-                            resolve(); // Resolve the promise to exit the loop
-                        } else {
-                            fetch('http://localhost:5000/product', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                },
-                                body: JSON.stringify({user_input: userMessage}), // Include user input in the request
-                            })
-                            .then(response => response.json())
-                            .then(data => {
-                                const model_response = data.data;
-                                console.log(model_response);
-                                botResponseCreator(model_response);
-                                resolve(); // Resolve the promise to continue the loop
-                            })
-                            .catch(error => {
-                                console.error("Error:", error);
-                                reject(error); // Reject the promise if there's an error
-                            });
-                        }
-                    }
-                };
+                // Check if the user wants to exit the loop
+                if (userMessage.toLowerCase() === 'exit') {
+                    console.log("Exiting the product query loop");
+                    // Remove the event listener to stop listening for further input
+                    userInput.removeEventListener("keypress", handleKeyPress);
+                    console.log("Product Function Finished");
+                    showOptions(options_data.chatinit.options);
 
-                userInput.addEventListener("keypress", userInputHandler);
+                } else {
+                    // Send user input to the backend server
+                    fetch('http://localhost:5000/product', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({user_input: userMessage}), // Include user input in the request
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Store the response in the variable
+                        const model_response = data.data;
+                        console.log(model_response);
+                        // Display the response to the user
+                        botResponseCreator(model_response);
 
-                // Add cleanup function to remove event listener on exit
-                resolveCleanup = () => userInput.removeEventListener("keypress", userInputHandler);
-            });
+                    })
+                    .catch(error => {
+                        // Log any errors that occur during the fetch request
+                        console.error("Error:", error);
+                    });
+                }
+            }
         }
 
-        while (true) {
-            await getProductData();
-        }
+        botResponseCreator("Please ask your questions! Press 'Exit' to return to the Main Menu. ");
+
+        // Add event listener for keypress event on the userInput element
+        userInput.addEventListener("keypress", handleKeyPress);
     }
 
     function handleCustomerReviews() {
+
+        botResponseCreator("Please wait while I gather all the customer reviews to get you an overall opinion.....");
 
         fetch('http://localhost:5000/review', {
             method: 'POST',
@@ -185,10 +188,14 @@ document.addEventListener("DOMContentLoaded", function() {
                 const model_response = data.data;
                 console.log(model_response);
                 botResponseCreator(model_response);
+
+                console.log("Customer Review Function finished");
+
+                showOptions(options_data.chatinit.options);
+
                 // You can also add the message to the chatbox here if needed
             })
             .catch(error => console.error("Error:", error));
-
 
     }
 
