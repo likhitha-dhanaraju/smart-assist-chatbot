@@ -32,11 +32,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function setupBot() {
 
-        // chrome.tabs.query({ active: true, lastFocusedWindow: true }, function(tabs) {
-        //     const currentUrl = tabs[0].url;
-        //     console.log(currentUrl)
+        chrome.tabs.query({ active: true, lastFocusedWindow: true }, function(tabs) {
+            const currentUrl = tabs[0].url;
+            console.log(currentUrl)
 
-        const currentUrl = "test"
         // Send message and URL to backend server
         fetch('http://localhost:5000/scrape_data', {
             method: 'POST',
@@ -48,7 +47,7 @@ document.addEventListener("DOMContentLoaded", function() {
             .then(response => response.json())
             .catch(error => console.error("Error:", error));
 
-        // });
+        });
 
         var first_message = document.createElement("p");
         first_message.innerHTML = "Please wait till the bot is setup!";
