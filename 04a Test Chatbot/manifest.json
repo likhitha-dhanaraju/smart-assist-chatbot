@@ -1,9 +1,0 @@
-{
-  "manifest_version": 3,
-  "name": "SmartAssist: Shopping Assistant",
-  "version": "1.0",
-  "permissions": ["activeTab", "storage"],
-  "action": {
-    "default_popup": "popup.html"
-  }
-}
