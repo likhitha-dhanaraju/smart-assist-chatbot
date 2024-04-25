@@ -1,5 +1,15 @@
 document.addEventListener("DOMContentLoaded", function() {
 
+    // Add an event listener to prevent closing the extension when clicking outside the popup
+    document.body.addEventListener('click', function(event) {
+        // Check if the clicked element is outside the extension popup
+        if (!event.target.closest('#popup-container')) {
+            // Prevent the default behavior (closing the extension popup)
+            event.preventDefault();
+        }
+    });
+
+
     var options_data = {
         chatinit: {
             title: ["Hello <span class='emoji'> &#128075; </span>", "You can select one of the below options to begin with!"],
@@ -14,48 +24,73 @@ document.addEventListener("DOMContentLoaded", function() {
     var cbot = document.getElementById("chat-box");
     var len1 = options_data.chatinit.title.length;
     const userInput = document.getElementById('user-input');
+    const refreshButton = document.getElementById('refreshButton'); // Added this line
+    // const closeButton = document.getElementById('closeButton'); // Add closeButton
+    //
+
+    // Add event listener to the refreshButton
+    refreshButton.addEventListener('click', function() {
+        initChat(); // Restart the chat when the button is clicked
+    });
+
+    // closeButton.addEventListener('click', function() {
+    //     window.close(); // Close the extension popup when closeButton is clicked
+    // });
 
     initChat();
 
     function initChat() {
         j = 0;
         cbot.innerHTML = '';
-        setupBot();
 
-        for (var i = 0; i < len1; i++) {
-            setTimeout(handleChat, (i * 500));
-        }
-        setTimeout(function () {
-            showOptions(options_data.chatinit.options)
-        }, ((len1 + 1) * 500))
+        // Call setupBot and handle its response
+        setupBot().then(response => {
+            if (response === "NOT AMAZON") {
+                // If the response is "NOT AMAZON", do not proceed further
+                botResponseCreator("The bot works on Amazon websites only!");
+                return;
+            }
+
+            // If the response is null or the website is Amazon, continue with other queries
+            for (var i = 0; i < len1; i++) {
+                setTimeout(handleChat, (i * 500));
+            }
+            setTimeout(function () {
+                showOptions(options_data.chatinit.options)
+            }, ((len1 + 1) * 500));
+        });
     }
 
     function setupBot() {
+        return new Promise((resolve, reject) => {
+            botResponseCreator("Please wait till the bot is setup!");
 
-        chrome.tabs.query({ active: true, lastFocusedWindow: true }, function(tabs) {
-            const currentUrl = tabs[0].url;
-            console.log(currentUrl)
+            chrome.tabs.query({ active: true, lastFocusedWindow: true }, function(tabs) {
+                const currentUrl = tabs[0].url;
+                console.log(currentUrl)
 
-        // Send message and URL to backend server
-        fetch('http://localhost:5000/scrape_data', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({url: currentUrl}), // Include URL in the request
-        })
-            .then(response => response.json())
-            .catch(error => console.error("Error:", error));
-
+                // Send message and URL to backend server
+                fetch('http://localhost:5000/scrape_data', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({url: currentUrl}), // Include URL in the request
+                })
+                .then(response => response.json())
+                .then(data => {
+                    const model_response = data.data;
+                    console.log(model_response);
+                    resolve(model_response); // Resolve with the model response
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    reject(error); // Reject with error if there's an error
+                });
+            });
         });
-
-        var first_message = document.createElement("p");
-        first_message.innerHTML = "Please wait till the bot is setup!";
-        first_message.setAttribute("class", "msg");
-        cbot.appendChild(first_message);
-        handleScroll();
-
     }
+
 
     var j = 0;
 
@@ -154,6 +189,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         console.log(model_response);
                         // Display the response to the user
                         botResponseCreator(model_response);
+                        botResponseCreator("I hope that answered your question! You can ask more questions or press 'Exit' to return to the Main Menu. ");
 
                     })
                     .catch(error => {
@@ -164,7 +200,7 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         }
 
-        botResponseCreator("Please ask your questions! Press 'Exit' to return to the Main Menu. ");
+        botResponseCreator("Please ask your questions! Enter 'Exit' to return to the Main Menu. ");
 
         // Add event listener for keypress event on the userInput element
         userInput.addEventListener("keypress", handleKeyPress);

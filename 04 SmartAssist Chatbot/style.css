@@ -21,7 +21,8 @@ body{
     height: 5rem;
     width: 22rem;
     margin:auto;
-    background: linear-gradient(90deg, #232F3E, #131921);
+    background: #131921;
+    /*background: linear-gradient(90deg, #232F3E, #131921);*/
 }
 
 /* Header */
@@ -137,7 +138,7 @@ body{
 
 
 .msg{
-    background: #FF9900;
+    background: #37475A;
     padding: 5px 20px;
     margin-top: 5px;
     border-top-right-radius: 15px;
@@ -146,13 +147,13 @@ body{
     width: max-content;
     font-size: 12px;
     color: white;
-    box-shadow: 0px -10px 15px rgba(0, 0, 0, 0.1);
+    /*box-shadow: 0px -10px 15px rgba(0, 0, 0, 0.1);*/
     max-width: 70%;
 }
 
 
 .userMsg {
-    background: #264B5D;
+    background: #232F3E;
     padding: 5px 20px;
     margin-top: 5px;
     border-top-left-radius: 15px; /* Adjusted border radius */

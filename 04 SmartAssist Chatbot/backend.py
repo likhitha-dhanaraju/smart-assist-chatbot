@@ -1,3 +1,6 @@
+import sys
+sys.dont_write_bytecode = True
+
 from flask import Flask, request
 from model_responses import *
 from flask_cors import CORS
