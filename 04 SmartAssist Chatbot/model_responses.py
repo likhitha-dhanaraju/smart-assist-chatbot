@@ -5,7 +5,6 @@ from transformers import T5ForConditionalGeneration, T5Tokenizer
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer, pipeline
 from utils.amazon_scrapper import amazon_scrapping
 
-import json
 import os
 import warnings
 warnings.filterwarnings("ignore")
