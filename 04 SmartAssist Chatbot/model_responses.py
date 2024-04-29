@@ -1,6 +1,7 @@
 import sys
 sys.dont_write_bytecode = True
 
+import torch
 from transformers import T5ForConditionalGeneration, T5Tokenizer
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer, pipeline
 from utils.amazon_scrapper import amazon_scrapping
@@ -11,8 +12,8 @@ warnings.filterwarnings("ignore")
 
 
 root = r'C:\\Users\\likhi\\Documents\\02 Pycharm Datasets\\01 Master Thesis\\07 QnA\\Saved Models\\'
-qna_model = T5ForConditionalGeneration.from_pretrained(os.path.join(root, "trained_t5_model_10_percent_data_epoch_10"))
-qna_tokenizer = T5Tokenizer.from_pretrained(os.path.join(root, "trained_t5_model_10_percent_data_epoch_10"))
+qna_model = T5ForConditionalGeneration.from_pretrained(os.path.join(root, "trained_t5_model_first_10_percent_data_shuffled_epoch 5"))
+qna_tokenizer = T5Tokenizer.from_pretrained(os.path.join(root, "trained_t5_model_first_10_percent_data_shuffled_epoch 5"))
 
 # Load the model from the saved directory
 output_dir = r"C:\Users\likhi\Documents\02 Pycharm Datasets\01 Master Thesis\08 Review Data\Saved Models"
@@ -47,7 +48,19 @@ def generate_product_response(user_input, scraped_data):
 
     if 'product_overview' != {}:
         for key, value in scraped_data['product_overview'].items():
-            context_input += key + ":" + value
+            context_input += key + ":" + value + ". "
+
+    # Tokenize input text
+    inputs = qna_tokenizer(user_input, context_input, padding="max_length", truncation=True,
+                       max_length=512, add_special_tokens=True)
+    input_ids = torch.tensor(inputs["input_ids"], dtype=torch.long).unsqueeze(0)
+    attention_mask = torch.tensor(inputs["attention_mask"], dtype=torch.long).unsqueeze(0)
+
+    # Generate answer
+    with torch.no_grad():
+        output = qna_model.generate(input_ids=input_ids, attention_mask=attention_mask)  # Adjust max_length as needed
+        answer = qna_tokenizer.decode(output.flatten(), skip_special_tokens=True)
+        answer = answer.replace("See more is", "")
 
     model_input = f"context: {context_input} question: {user_input} about the product"
     input_ids = qna_tokenizer.encode(model_input, return_tensors="pt", truncation=True)
