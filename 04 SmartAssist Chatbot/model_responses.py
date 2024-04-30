@@ -50,6 +50,8 @@ def generate_product_response(user_input, scraped_data):
         for key, value in scraped_data['product_overview'].items():
             context_input += key + ":" + value + ". "
 
+    print(context_input)
+
     # Tokenize input text
     inputs = qna_tokenizer(user_input, context_input, padding="max_length", truncation=True,
                        max_length=512, add_special_tokens=True)
@@ -59,13 +61,9 @@ def generate_product_response(user_input, scraped_data):
     # Generate answer
     with torch.no_grad():
         output = qna_model.generate(input_ids=input_ids, attention_mask=attention_mask)  # Adjust max_length as needed
-        answer = qna_tokenizer.decode(output.flatten(), skip_special_tokens=True)
-        answer = answer.replace("See more is", "")
+        response = qna_tokenizer.decode(output.flatten(), skip_special_tokens=True)
+        # response = response.replace("See more is", "")
 
-    model_input = f"context: {context_input} question: {user_input} about the product"
-    input_ids = qna_tokenizer.encode(model_input, return_tensors="pt", truncation=True)
-    output_ids = qna_model.generate(input_ids, max_length=32, num_beams=4, early_stopping=True)
-    response = qna_tokenizer.decode(output_ids[0], skip_special_tokens=True)
     return response
 
 
