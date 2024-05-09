@@ -10,12 +10,7 @@ import warnings
 warnings.filterwarnings("ignore")
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes
-
-# @app.get("/")
-# def index_get():
-#     return render_template("base.html")
-
+CORS(app)  # Allow requests from your extension
 
 @app.route("/scrape_data", methods=["POST"])
 def scrape_data():
@@ -37,6 +32,12 @@ def review():
     response = generate_review_response(scraped_data)
     return {'data': response}
 
+
+@app.route("/recommendation", methods=["POST"])
+def product_recommendation():
+    user_input = request.get_json().get("user_input")
+    response_df = generate_recommendation_response(user_input, scraped_data)
+    return response_df.to_json(orient='records')
 
 if __name__ == "__main__":
     app.run(debug=True)

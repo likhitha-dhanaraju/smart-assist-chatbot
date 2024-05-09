@@ -3,6 +3,9 @@
   "name": "SmartAssist: Shopping Assistant",
   "version": "1.0",
   "permissions": ["activeTab", "storage", "tabs"],
+  "background": {
+    "service_worker": "background.js"
+  },
   "action": {
     "default_popup": "base.html"
   }

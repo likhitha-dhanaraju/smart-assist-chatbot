@@ -1,18 +1,8 @@
-chrome.runtime.onInstalled.addListener(() => {
-  // Clear all rules to ensure only our expected rules are set
-  chrome.declarativeContent.onPageChanged.removeRules(undefined, () => {
-    // Declare a rule to enable the action on example.com pages
-    let exampleRule = {
-      conditions: [
-        new chrome.declarativeContent.PageStateMatcher({
-          pageUrl: {hostSuffix: '.amazon.com'},
-        })
-      ],
-      actions: [new chrome.declarativeContent.ShowAction()],
-    };
-
-    // Finally, apply our new array of rules
-    let rules = [exampleRule];
-    chrome.declarativeContent.onPageChanged.addRules(rules);
-  });
+// Add event listener for tab updates
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  // Check if the tab update is complete and the URL includes '.amazon.com'
+  if (changeInfo.status === 'complete' && tab.url.includes('.amazon.com')) {
+    // Show the extension icon in the browser's toolbar for the corresponding tab
+    chrome.pageAction.show(tabId);
+  }
 });

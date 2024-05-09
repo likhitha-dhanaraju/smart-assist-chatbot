@@ -144,10 +144,10 @@ document.addEventListener("DOMContentLoaded", function() {
             console.log("Customer Function Redirected")
             handleCustomerReviews();
 
-            // } else if (firstSelectedOption.includes('personalized')){
-            //     handleRecommendations();
+        } else if (firstSelectedOption.includes('recommendations')){
+            handleRecommendations();
         } else {
-
+                botResponseCreator("None of the options selected")
         }
 
     }
@@ -255,4 +255,67 @@ document.addEventListener("DOMContentLoaded", function() {
         var elem = document.getElementById('chat-box');
         elem.scrollTop = elem.scrollHeight;
     }
+
+    function handleRecommendations() {
+
+        botResponseCreator("Please tell me what is the criteria for searching for similar products");
+        botResponseCreator("For ex. Laptop with same RAM and memory");
+
+        function handleKeyPress_Recommendation(event) {
+            // Check if the key pressed is Enter
+            if (event.key === "Enter") {
+                // Get the value of the input field and trim any leading or trailing whitespace
+                const userMessage = userInput.value.trim();
+                userResponseCreator(userMessage);
+                console.log('User input:', userMessage);
+
+                // Clear the input field
+                userInput.value = "";
+
+                // Check if the user wants to exit the loop
+                if (userMessage.toLowerCase() === 'exit') {
+                    console.log("Exiting the recommendation query loop");
+                    // Remove the event listener to stop listening for further input
+                    userInput.removeEventListener("keypress", handleKeyPress);
+                    console.log("Recommendation Function Finished");
+                    showOptions(options_data.chatinit.options);
+
+                } else {
+                    // Send user input to the backend server
+                    fetch('http://localhost:5000/recommendation', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({user_input: userMessage}), // Include user input in the request
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Store the response in the variable
+                        const model_response_df = data;
+                        console.log(model_response_df);
+                        // Display the response to the user
+
+                        for (let i = 0; i < 3; i++) {
+                            const row = model_response_df[i];
+                            botResponseCreator(`Product ${i + 1}: ${row['product_name']}, Link: ${row['product_link']}`);
+                        }
+                        botResponseCreator("I hope that answered your question! You can ask more questions or press 'Exit' to return to the Main Menu.");
+
+                    })
+                    .catch(error => {
+                        // Log any errors that occur during the fetch request
+                        console.error("Error:", error);
+                    });
+                }
+            }
+        }
+
+        botResponseCreator("Please ask your questions! Enter 'Exit' to return to the Main Menu. ");
+
+        // Add event listener for keypress event on the userInput element
+        userInput.addEventListener("keypress", handleKeyPress_Recommendation);
+    }
+
 });
+
