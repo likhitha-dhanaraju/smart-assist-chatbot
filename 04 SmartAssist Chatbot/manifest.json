@@ -7,6 +7,17 @@
     "service_worker": "background.js"
   },
   "action": {
-    "default_popup": "base.html"
-  }
+    "default_popup": "base.html",
+    "default_icon": {
+      "16": "images/icon_16x16.png",
+      "48": "images/icon_48x48.png",
+      "128": "images/icon_128x128.png"
+    }
+  },
+  "icons": {
+      "16": "images/icon_16x16.png",
+      "48": "images/icon_48x48.png",
+      "128": "images/icon_128x128.png"
+    }
 }
+
