@@ -276,7 +276,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 if (userMessage.toLowerCase() === 'exit') {
                     console.log("Exiting the recommendation query loop");
                     // Remove the event listener to stop listening for further input
-                    userInput.removeEventListener("keypress", handleKeyPress);
+                    userInput.removeEventListener("keypress", handleKeyPress_Recommendation);
                     console.log("Recommendation Function Finished");
                     showOptions(options_data.chatinit.options);
 
@@ -296,9 +296,19 @@ document.addEventListener("DOMContentLoaded", function() {
                         console.log(model_response_df);
                         // Display the response to the user
 
-                        for (let i = 0; i < 3; i++) {
-                            const row = model_response_df[i];
-                            botResponseCreator(`Product ${i + 1}: ${row['product_name']}, Link: ${row['product_link']}`);
+                        if (model_response_df.length === 0 ) {
+                            botResponseCreator("Sorry, could not find any products :(");
+                        }
+                        else {
+                            for (let i = 0; i < 3; i++) {
+                                const row = model_response_df[i];
+                                const recommendationOutput = `
+                                        <strong>${row['product_name']}</strong><br>
+                                        <img src="${row['product_image']}" alt="${row['product_image']}" style="max-width: 60%; max-height: 60%;"><br>
+                                        <a href="${row['product_link']}" style="color: lightseagreen; text-decoration: underline;">${row['product_link']}</a><br>`;
+                                // Send the recommendation output to the bot response creator
+                                botResponseCreator(recommendationOutput);
+                            }
                         }
                         botResponseCreator("I hope that answered your question! You can ask more questions or press 'Exit' to return to the Main Menu.");
 

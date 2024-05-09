@@ -181,7 +181,7 @@ def search(phrase, product_title):
     proxies = random.choice(proxies_list)
     headers = get_random_headers()
 
-    phrase = product_title + " " + phrase
+    phrase = phrase + " as " + product_title
     phrase = re.sub(r'[^a-zA-Z0-9]', ' ', phrase)
     phrase = re.sub(' ', '+', phrase)
 
@@ -225,6 +225,7 @@ def search(phrase, product_title):
             if not 'www.amazon.comhttps' in product_link:
                 product_data = amazon_scrapping_for_prod_recom(product_link, proxies, headers)
                 product_data['image_link'] = product_image_url
+                print(product_image_url)
                 final_product_data = product_data_for_recommendation(product_data,
                                                                      similarity_score_column_required=True)
 
@@ -258,7 +259,9 @@ def similarity_scores(similar_products_df, current_product_data):
 
 def generate_recommendation_response(user_input, scraped_data):
     current_product_data = product_data_for_recommendation(scraped_data, similarity_score_column_required=False)
-    print(current_product_data)
     similar_products_df = search(user_input, current_product_data['product_name'])
     sorted_similar_products_df = similarity_scores(similar_products_df, current_product_data)
+
+    print(sorted_similar_products_df)
+
     return sorted_similar_products_df
