@@ -45,6 +45,7 @@ def get_features_list(response):
     for feat_text in response.xpath('//*[@id="productFactsDesktopExpander"]/div[1]/ul/span/li/span/text()'):
         if feat_text.strip() and len(feat_text) > 1:
             features_list.append(cleanhtml(feat_text).encode("ascii", "ignore").decode())
+    print("DESCRIPTION", features_list)
     return features_list
 
 
@@ -83,9 +84,33 @@ def table_features_list(response):
     return features_json
 
 
+def get_review_extraction(response):
+    review_data = []
+    reviews = response.xpath('.//div[@class="a-section celwidget"]')
+
+    for review in reviews:
+        try:
+            text = "".join([i.strip() for i in review.xpath('.//span[@data-hook="review-body"]//text()')]).replace("\n",
+                                                                                                                   "")
+            header = review.xpath('.//a[@data-hook="review-title"]//span[2]//text()')
+
+            if type(header) == list:
+                header = header[0]
+
+            review_data.append({"header": header,
+                                "text": text
+                                })
+
+        except Exception as e:
+            continue
+
+    return review_data
+
+
+
 def main(url, proxies, headers):
 
-    r = requests.get(url, headers=headers, proxies=proxies)
+    r = requests.get(url)
     response = html.fromstring(r.content)
 
     url = r.url.strip().split("/ref=")[0]
@@ -105,6 +130,7 @@ def main(url, proxies, headers):
     else:
         pv_item["description"] = get_bullet_feature(response)
 
+    pv_item["reviews"] = get_review_extraction(response)
     pv_item['product_overview'] = table_features_list(response)
 
     product_details_json = get_product_details_upper(response)
@@ -119,3 +145,61 @@ def amazon_scrapping_for_prod_recom(url, proxies, headers):
     product_data = main(url, proxies, headers)
 
     return product_data
+
+#
+# import random
+# from fake_useragent import UserAgent
+#
+# def get_proxies():
+#     ua = UserAgent()
+#     headers = {'User-Agent': ua.random}
+#     url = 'https://free-proxy-list.net/'
+#
+#     r = requests.get(url, headers=headers)
+#     page = BeautifulSoup(r.text, 'html.parser')
+#
+#     proxies = []
+#
+#     for proxy in page.find_all('tr'):
+#         i = ip = port = 0
+#
+#         for data in proxy.find_all('td'):
+#             if i == 0:
+#                 ip = data.get_text()
+#             if i == 1:
+#                 port = data.get_text()
+#             i += 1
+#
+#         if ip != 0 and port != 0 and '.' in ip:
+#             proxies += [{'http': 'http://' + ip + ':' + port}]
+#
+#     return proxies
+#
+#
+# ua = UserAgent()
+#
+#
+# def get_random_headers():
+#     headers = {
+#         'authority': 'www.amazon.com',
+#         'pragma': 'no-cache',
+#         'cache-control': 'no-cache',
+#         'dnt': '1',
+#         'Connection': 'keep-alive',
+#         'upgrade-insecure-requests': '1',
+#         'user-agent': ua.random,
+#         'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+#         'sec-fetch-site': 'none',
+#         'sec-fetch-mode': 'navigate',
+#         'sec-fetch-dest': 'document',
+#         'accept-language': 'en-GB,en-US;q=0.9,en;q=0.8',
+#     }
+#
+#     return headers
+#
+# proxies_list = get_proxies()
+# proxies = random.choice(proxies_list)
+# headers = get_random_headers()
+#
+# print(amazon_scrapping_for_prod_recom('https://www.amazon.com/Surround-Headphones-Cancelling-Flexible-Earmuffs/dp/B09TB15CTL',
+#                                       proxies=proxies, headers=headers))

@@ -9,7 +9,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 import torch
 from transformers import T5ForConditionalGeneration, T5Tokenizer
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer, pipeline
-from utils.amazon_scrapper_for_product_recommendation import amazon_scrapping_for_prod_recom
+from utils.amazon_scrapper_with_reviews_and_for_product_recommendation import amazon_scrapping_for_prod_recom
 
 import os
 import re
@@ -31,6 +31,9 @@ output_dir = r"C:\Users\likhi\Documents\02 Pycharm Datasets\01 Master Thesis\08 
 review_model = AutoModelForSeq2SeqLM.from_pretrained(os.path.join(output_dir, 'Review Summarisation'))
 review_tokenizer = AutoTokenizer.from_pretrained(os.path.join(output_dir, 'Review Summarisation'))
 # Create a new pipeline with the loaded model
+max_length = 2048  # Set the desired maximum length
+# Adjust the tokenizer's max_length parameter
+review_tokenizer.model_max_length = max_length
 loaded_review_summarizer = pipeline("summarization", model=review_model, tokenizer=review_tokenizer)
 
 cosine_similarity_model = SentenceTransformer('multi-qa-MiniLM-L6-cos-v1')  #'msmarco-distilbert-base-v4'
@@ -107,6 +110,11 @@ def generate_product_response(user_input, scraped_data):
     # if 'variant_data' != []:
     #     for i, item in enumerate(scraped_data['variant_data']):
     #         context_input += "variant {}".format(i+1) + "is " + scraped_data['variant_data'][i]['product_' + str(i+1)]['name']
+
+    if 'product_overview' != {}:
+        for key, value in scraped_data['product_overview'].items():
+            context_input += key + ":" + value + ". "
+
     if 'description' in data_keys:
         if type(scraped_data['description']) == list:
             for line in scraped_data['description']:
@@ -114,9 +122,6 @@ def generate_product_response(user_input, scraped_data):
         else:
             context_input += "product description is " + scraped_data['description']
 
-    if 'product_overview' != {}:
-        for key, value in scraped_data['product_overview'].items():
-            context_input += key + ":" + value + ". "
 
 
     # Tokenize input text
@@ -138,12 +143,25 @@ def generate_review_response(scraped_data):
 
     if scraped_data['reviews'] != []:
 
-        product_data_reviews = ["Title: " + i['header'] + '. Text:' + i['text']
+        product_data_reviews = ["Title: " + i['header'] + '. Text: ' + i['text']
                                 for i in scraped_data['reviews']]
         product_data_reviews_text = '. '.join(product_data_reviews)
-        model_response = loaded_review_summarizer(product_data_reviews_text, min_length = 50)
+
+        product_data_reviews_text = product_data_reviews_text.replace("READ it", "")
+        product_data_reviews_text = product_data_reviews_text.replace("Read it", "")
+        product_data_reviews_text = product_data_reviews_text.replace("READ more", "")
+        product_data_reviews_text = product_data_reviews_text.replace("Read more", "")
+
+        print(product_data_reviews_text)
+
+
+        if len(product_data_reviews_text.strip().split()) > 900:
+            product_data_reviews_text = " ".join(product_data_reviews_text.strip().split()[:700])
+
+        model_response = loaded_review_summarizer(product_data_reviews_text, min_length=50)
         response = model_response[0]['summary_text']
         return response
+
     else:
         return "There are no customer reviews for this product yet!"
 
@@ -262,6 +280,5 @@ def generate_recommendation_response(user_input, scraped_data):
     similar_products_df = search(user_input, current_product_data['product_name'])
     sorted_similar_products_df = similarity_scores(similar_products_df, current_product_data)
 
-    print(sorted_similar_products_df)
 
     return sorted_similar_products_df

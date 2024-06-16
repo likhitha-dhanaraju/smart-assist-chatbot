@@ -16,7 +16,9 @@ CORS(app)  # Allow requests from your extension
 def scrape_data():
     global scraped_data
     url = request.get_json().get("url")
+    url = url.strip().split("/ref")[0]
     scraped_data = scrape_data_from_url(url)
+    print(scraped_data)
     return {'data': scraped_data}
 
 
@@ -24,12 +26,14 @@ def scrape_data():
 def product():
     text = request.get_json().get("user_input")
     response = generate_product_response(text, scraped_data)
+    print(response)
     return {'data': response}
 
 
 @app.route("/review", methods=["POST"])
 def review():
     response = generate_review_response(scraped_data)
+    print(review)
     return {'data': response}
 
 
@@ -37,6 +41,7 @@ def review():
 def product_recommendation():
     user_input = request.get_json().get("user_input")
     response_df = generate_recommendation_response(user_input, scraped_data)
+    print(response_df)
     return response_df.to_json(orient='records')
 
 if __name__ == "__main__":

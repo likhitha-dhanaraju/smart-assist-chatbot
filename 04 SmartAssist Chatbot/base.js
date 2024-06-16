@@ -302,9 +302,11 @@ document.addEventListener("DOMContentLoaded", function() {
                         else {
                             for (let i = 0; i < 3; i++) {
                                 const row = model_response_df[i];
+                                // <img src="${row['product_image']}" alt="${row['product_image']}" style="max-width: 60%; max-height: 60%;"><br>
+
                                 const recommendationOutput = `
                                         <strong>${row['product_name']}</strong><br>
-                                        <img src="${row['product_image']}" alt="${row['product_image']}" style="max-width: 60%; max-height: 60%;"><br>
+                                    
                                         <a href="${row['product_link']}" style="color: lightseagreen; text-decoration: underline;">${row['product_link']}</a><br>`;
                                 // Send the recommendation output to the bot response creator
                                 botResponseCreator(recommendationOutput);
