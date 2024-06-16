@@ -1,10 +1,3 @@
-# smart-assist-chatbot
-SmartAssist: An intelligent chatbot enhancing e-commerce shopping experiences by integrating advanced image-to-text, text QnA, and customer opinion mining models.
-
-Certainly! Below is a GitHub README file based on the provided master's thesis document:
-
----
-
 # SmartAssist: Enhancing User Shopping on E-commerce Websites
 
 ## Overview
